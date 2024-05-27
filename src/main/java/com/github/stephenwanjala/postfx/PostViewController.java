@@ -1,21 +1,12 @@
 package com.github.stephenwanjala.postfx;
 
 import com.github.stephenwanjala.postfx.domain.model.Post;
-import com.github.stephenwanjala.postfx.util.PdfExporter;
 import com.github.stephenwanjala.postfx.util.PrinterUtil;
+import com.github.stephenwanjala.postfx.viewmodel.PostViewModel;
 import javafx.application.Platform;
 import javafx.collections.ListChangeListener;
 import javafx.fxml.FXML;
-import javafx.scene.control.Label;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableView;
-import javafx.scene.control.TextField;
-import javafx.fxml.FXML;
 import javafx.scene.control.*;
-import javafx.scene.layout.VBox;
-
-import java.io.IOException;
-import com.github.stephenwanjala.postfx.viewmodel.PostViewModel;
 
 public class PostViewController {
     @FXML
@@ -30,22 +21,24 @@ public class PostViewController {
     private TableColumn<Post, String> bodyCol;
     @FXML
     private Pagination pagination;
+    @FXML
+    private ProgressIndicator progressIndicator;
 
     private PostViewModel viewModel;
 
     public void initialize() {
+        progressIndicator.setVisible(true);
         viewModel = new PostViewModel();
-
         idCol.setCellValueFactory(cellData -> cellData.getValue().idProperty().asObject());
         titleCol.setCellValueFactory(cellData -> cellData.getValue().titleProperty());
         bodyCol.setCellValueFactory(cellData -> cellData.getValue().bodyProperty());
-
         filterField.textProperty().bindBidirectional(viewModel.filterTextProperty());
         filterField.textProperty().addListener((obs, oldText, newText) -> updatePagination());
         viewModel.getPosts().addListener((ListChangeListener<Post>) change -> {
             updatePagination();
-            tableView.getItems().setAll(viewModel.getPagedPosts());
+            Platform.runLater(() -> tableView.getItems().setAll(viewModel.getPagedPosts()));
             tableView.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY_ALL_COLUMNS);
+
         });
 
         pagination.currentPageIndexProperty().addListener((obs, oldIndex, newIndex) -> updateTableView(newIndex.intValue()));
@@ -54,33 +47,37 @@ public class PostViewController {
     }
 
     private void updatePagination() {
-       Platform.runLater(()->{
-           int pageCount = (viewModel.getPosts().size() / 10) + 1;
-           System.out.println("Page count: " + pageCount);
-           System.out.println("Filtered posts: " + viewModel.updateFilteredPosts().size());
-           pagination.setPageCount(pageCount);
-           updateTableView(0);
-       });
+        Platform.runLater(() -> {
+            progressIndicator.setVisible(true);
+            int pageCount = (viewModel.getPosts().size() / 10) + 1;
+            System.out.println("Page count: " + pageCount);
+            System.out.println("Filtered posts: " + viewModel.updateFilteredPosts().size());
+            pagination.setPageCount(pageCount);
+            updateTableView(0);
+            progressIndicator.setVisible(false);
+        });
     }
 
     private void updateTableView(int pageIndex) {
         Platform.runLater(() -> {
+            progressIndicator.setVisible(true);
             viewModel.currentPageProperty().set(pageIndex);
             tableView.getItems().setAll(viewModel.getPagedPosts());
-    });
+            progressIndicator.setVisible(false);
+        });
     }
+
 
     @FXML
     private void handleExportPdf() {
-        try {
-            PdfExporter.exportToPdf(viewModel.getPosts(), "posts.pdf");
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        progressIndicator.setVisible(true);
+
     }
 
     @FXML
     private void handlePrint() {
+        progressIndicator.setVisible(true);
         PrinterUtil.print(tableView);
+        progressIndicator.setVisible(false);
     }
 }

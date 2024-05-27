@@ -1,23 +1,40 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Pagination?>
+<?import javafx.scene.control.ProgressIndicator?>
 <?import javafx.scene.control.TableColumn?>
 <?import javafx.scene.control.TableView?>
 <?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
 
-<VBox xmlns:fx="http://javafx.com/fxml" fx:controller="com.github.stephenwanjala.postfx.PostViewController">
-    <TextField fx:id="filterField" promptText="Filter posts..."/>
-    <TableView fx:id="tableView">
-        <columns>
-            <TableColumn fx:id="idCol" text="ID"/>
-            <TableColumn fx:id="titleCol" text="Title"/>
-            <TableColumn fx:id="bodyCol" text="Body"/>
-        </columns>
-    </TableView>
-    <Pagination fx:id="pagination"/>
-    <Button text="Export to PDF" onAction="#handleExportPdf"/>
-    <Button text="Print" onAction="#handlePrint"/>
+<VBox xmlns="http://javafx.com/javafx/22" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.github.stephenwanjala.postfx.PostViewController">
+    <TextField fx:id="filterField" promptText="Filter posts..." />
+    <StackPane>
+        <TableView fx:id="tableView">
+            <columns>
+                <TableColumn fx:id="idCol" text="ID" />
+                <TableColumn fx:id="titleCol" text="Title" />
+                <TableColumn fx:id="bodyCol" text="Body" />
+            </columns>
+        </TableView>
+        <ProgressIndicator fx:id="progressIndicator" prefHeight="50" prefWidth="50" />
+    </StackPane>
+    <Pagination fx:id="pagination" />
+    <HBox alignment="CENTER">
+        <Button onAction="#handleExportPdf" text="Export to PDF">
+         <HBox.margin>
+            <Insets left="32.0" />
+         </HBox.margin></Button>
+        <Button onAction="#handlePrint" text="Print">
+         <opaqueInsets>
+            <Insets top="32.0" />
+         </opaqueInsets>
+         <HBox.margin>
+            <Insets bottom="8.0" left="8.0" right="8.0" top="8.0" />
+         </HBox.margin></Button>
+    </HBox>
 </VBox>
-
