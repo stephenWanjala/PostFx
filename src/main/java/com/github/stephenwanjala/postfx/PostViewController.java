@@ -3,6 +3,7 @@ package com.github.stephenwanjala.postfx;
 import com.github.stephenwanjala.postfx.domain.model.Post;
 import com.github.stephenwanjala.postfx.util.PdfExporter;
 import com.github.stephenwanjala.postfx.util.PrinterUtil;
+import javafx.application.Platform;
 import javafx.collections.ListChangeListener;
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;
@@ -53,16 +54,20 @@ public class PostViewController {
     }
 
     private void updatePagination() {
-        int pageCount = (viewModel.getPosts().size() / 10) + 1;
-        System.out.println("Page count: " + pageCount);
-        System.out.println("Filtered posts: " + viewModel.updateFilteredPosts().size());
-        pagination.setPageCount(pageCount);
-        updateTableView(0);
+       Platform.runLater(()->{
+           int pageCount = (viewModel.getPosts().size() / 10) + 1;
+           System.out.println("Page count: " + pageCount);
+           System.out.println("Filtered posts: " + viewModel.updateFilteredPosts().size());
+           pagination.setPageCount(pageCount);
+           updateTableView(0);
+       });
     }
 
     private void updateTableView(int pageIndex) {
-        viewModel.currentPageProperty().set(pageIndex);
-        tableView.getItems().setAll(viewModel.getPagedPosts());
+        Platform.runLater(() -> {
+            viewModel.currentPageProperty().set(pageIndex);
+            tableView.getItems().setAll(viewModel.getPagedPosts());
+    });
     }
 
     @FXML

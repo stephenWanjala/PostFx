@@ -11,7 +11,7 @@ public class PostsApplication extends Application {
     @Override
     public void start(Stage stage) throws IOException {
         FXMLLoader fxmlLoader = new FXMLLoader(PostsApplication.class.getResource("posts-view.fxml"));
-        Scene scene = new Scene(fxmlLoader.load());
+        Scene scene = new Scene(fxmlLoader.load(), 800, 600);
         stage.setTitle("Posts Application");
         stage.setScene(scene);
         stage.show();
